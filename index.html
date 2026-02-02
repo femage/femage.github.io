@@ -1,74 +1,132 @@
-<script>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Will you be my Valentine?</title>
+  <style>
+    :root{
+      --bg1:#ff5f9e;
+      --bg2:#ffd1dc;
+      --card:#ffffffcc;
+      --text:#1b1b1b;
+      --yes:#16a34a;
+      --no:#ef4444;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(circle at 20% 20%, var(--bg2), var(--bg1));
+      overflow:hidden;
+    }
+    .card{
+      width:min(720px, 92vw);
+      background:var(--card);
+      backdrop-filter: blur(8px);
+      border-radius:24px;
+      padding:28px;
+      box-shadow: 0 18px 40px rgba(0,0,0,.18);
+      text-align:center;
+      position:relative;
+    }
+    h1{margin:0 0 10px; font-size: clamp(26px, 4vw, 44px);}
+    .arena{
+      position:relative;
+      width:100%;
+      height:240px;
+      border-radius:18px;
+      background: rgba(255,255,255,.5);
+      overflow:hidden;
+    }
+    .btn{
+      border:none;
+      padding:14px 22px;
+      border-radius:999px;
+      font-size:18px;
+      font-weight:700;
+      color:white;
+      position:absolute;
+      transform: translate(-50%, -50%);
+      cursor:pointer;
+    }
+    #yes{ background:#16a34a; left:35%; top:55%; }
+    #no{ background:#ef4444; left:65%; top:55%; }
+    .celebrate{ display:none; margin-top:20px; }
+    .celebrate img{ width:100%; max-width:420px; border-radius:16px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Will you be my Valentine? 💘</h1>
+    <div class="arena" id="arena">
+      <button class="btn" id="yes">Yes</button>
+      <button class="btn" id="no">No</button>
+    </div>
+    <div class="celebrate" id="celebrate">
+      <h2>YaY!! 🎉</h2>
+      <img src="confetti.gif" alt="Confetti" />
+    </div>
+  </div>
+
+  <script>
 const no = document.getElementById('no');
 const yes = document.getElementById('yes');
 const arena = document.getElementById('arena');
-const celebrate = document.getElementById('celebrate');
 
 no.onclick = startCarScene;
 
 function startCarScene() {
 
-  // Hide buttons
   no.style.display = "none";
 
-  // Create car
   const car = document.createElement("img");
   car.src = "mcqueen.gif";
   car.style.position = "absolute";
   car.style.width = "120px";
-  car.style.bottom = "0px";
   car.style.right = "0px";
+  car.style.bottom = "0px";
   car.style.transition = "all 1.2s linear";
   arena.appendChild(car);
 
-  // Create track maker
   function dropTrack(x, y) {
     const t = document.createElement("img");
     t.src = "tracks.png";
     t.style.position = "absolute";
-    t.style.width = "60px";
+    t.style.width = "50px";
     t.style.left = x + "px";
     t.style.top = y + "px";
     t.style.opacity = "0.8";
     arena.appendChild(t);
   }
 
-  // PHASE 1: Speed upward
   setTimeout(() => {
-    car.style.transform = "translate(-300px, -180px) rotate(-20deg)";
+    car.style.transform = "translate(-300px, -200px) rotate(-25deg)";
   }, 50);
 
-  // Drop tracks while moving
   let trackInterval = setInterval(() => {
     const rect = car.getBoundingClientRect();
     const arenaRect = arena.getBoundingClientRect();
     dropTrack(rect.left - arenaRect.left, rect.top - arenaRect.top);
   }, 120);
 
-  // PHASE 2: Skid & turn
   setTimeout(() => {
     car.style.transform += " rotate(180deg)";
   }, 1300);
 
-  // PHASE 3: Drive to YES button
   setTimeout(() => {
     const yesRect = yes.getBoundingClientRect();
     const arenaRect = arena.getBoundingClientRect();
-    const targetX = yesRect.left - arenaRect.left;
-    const targetY = yesRect.top - arenaRect.top;
+    car.style.left = (yesRect.left - arenaRect.left) + "px";
+    car.style.top = (yesRect.top - arenaRect.top) + "px";
     car.style.transition = "all 1s ease-in";
-    car.style.left = targetX + "px";
-    car.style.top = targetY + "px";
-    car.style.transform = "rotate(180deg)";
   }, 2000);
 
-  // Stop track dropping
   setTimeout(() => {
     clearInterval(trackInterval);
-  }, 2600);
-
-  // When car "runs over" YES
-  setTimeout(() => {
     yes.style.display = "none";
     showFinalScene();
   }, 3000);
@@ -85,15 +143,15 @@ function showFinalScene() {
   img.style.transition = "all 2s ease";
   arena.appendChild(img);
 
-  // Zoom in
   setTimeout(() => {
     img.style.transform = "translate(-50%, -50%) scale(2)";
   }, 100);
 
-  // Fade out
   setTimeout(() => {
     img.style.opacity = "0";
-  }, 2000);
+  }, 2200);
 }
 </script>
 
+</body>
+</html>
