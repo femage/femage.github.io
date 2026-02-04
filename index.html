@@ -73,13 +73,18 @@
   </div>
 
   <script>
-const no = document.getElementById('no');
-const yes = document.getElementById('yes');
-const arena = document.getElementById('arena');
+const no = document.getElementById("no");
+const yes = document.getElementById("yes");
+const arena = document.getElementById("arena");
 
-no.onclick = startCarScene;
+let sceneTriggered = false;
 
-function startCarScene() {
+no.onclick = startScene;
+yes.onclick = showFinalMeme; // works if user clicks
+
+function startScene() {
+  if (sceneTriggered) return;
+  sceneTriggered = true;
 
   no.style.display = "none";
 
@@ -89,57 +94,76 @@ function startCarScene() {
   car.style.width = "120px";
   car.style.right = "0px";
   car.style.bottom = "0px";
-  car.style.transition = "all 1.2s linear";
+  car.style.transition = "transform 1.2s linear";
   arena.appendChild(car);
 
-  function dropTrack(x, y) {
+  dropTracks(car);
+
+  // PHASE 1 — drive up-left
+  setTimeout(() => {
+    car.style.transform = "translate(-350px, -220px) rotate(-25deg)";
+  }, 50);
+
+  // PHASE 2 — skid
+  setTimeout(() => {
+    car.style.transition = "transform 0.6s ease-out";
+    car.style.transform = "translate(-380px, -240px) rotate(60deg)";
+  }, 1300);
+
+  // PHASE 3 — turn toward YES
+  setTimeout(() => {
+    driveToYes(car);
+  }, 2000);
+}
+
+function driveToYes(car) {
+  const yesRect = yes.getBoundingClientRect();
+  const arenaRect = arena.getBoundingClientRect();
+
+  const dx = yesRect.left - arenaRect.left - 40;
+  const dy = yesRect.top - arenaRect.top - 40;
+
+  car.style.transition = "transform 1s ease-in";
+  car.style.transform = `translate(${dx}px, ${dy}px) rotate(180deg)`;
+
+  // Detect "hit"
+  setTimeout(() => {
+    showFinalMeme();
+  }, 1000);
+}
+
+function dropTracks(car) {
+  const interval = setInterval(() => {
+    if (sceneTriggered === false) return;
+    const rect = car.getBoundingClientRect();
+    const arenaRect = arena.getBoundingClientRect();
+
     const t = document.createElement("img");
     t.src = "tracks.png";
     t.style.position = "absolute";
     t.style.width = "50px";
-    t.style.left = x + "px";
-    t.style.top = y + "px";
-    t.style.opacity = "0.8";
+    t.style.left = rect.left - arenaRect.left + "px";
+    t.style.top = rect.top - arenaRect.top + "px";
+    t.style.opacity = "0.85";
     arena.appendChild(t);
-  }
-
-  setTimeout(() => {
-    car.style.transform = "translate(-300px, -200px) rotate(-25deg)";
-  }, 50);
-
-  let trackInterval = setInterval(() => {
-    const rect = car.getBoundingClientRect();
-    const arenaRect = arena.getBoundingClientRect();
-    dropTrack(rect.left - arenaRect.left, rect.top - arenaRect.top);
   }, 120);
 
-  setTimeout(() => {
-    car.style.transform += " rotate(180deg)";
-  }, 1300);
-
-  setTimeout(() => {
-    const yesRect = yes.getBoundingClientRect();
-    const arenaRect = arena.getBoundingClientRect();
-    car.style.left = (yesRect.left - arenaRect.left) + "px";
-    car.style.top = (yesRect.top - arenaRect.top) + "px";
-    car.style.transition = "all 1s ease-in";
-  }, 2000);
-
-  setTimeout(() => {
-    clearInterval(trackInterval);
-    yes.style.display = "none";
-    showFinalScene();
-  }, 3000);
+  setTimeout(() => clearInterval(interval), 2600);
 }
 
-function showFinalScene() {
+function showFinalMeme() {
+  if (document.getElementById("finalMeme")) return;
+
+  yes.style.display = "none";
+
   const img = document.createElement("img");
+  img.id = "finalMeme";
   img.src = "final.jpg";
   img.style.position = "absolute";
   img.style.left = "50%";
   img.style.top = "50%";
   img.style.transform = "translate(-50%, -50%) scale(0.5)";
-  img.style.width = "200px";
+  img.style.width = "220px";
   img.style.transition = "all 2s ease";
   arena.appendChild(img);
 
